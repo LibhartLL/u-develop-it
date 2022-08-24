@@ -21,7 +21,23 @@ const db = mysql.createConnection(
     console.log('Connected to the election database.')
 );
 
-// GET a single candidate
+// Get all candidates
+app.get('/api/candidates', (req, res) => {
+    const sql = `SELECT * FROM candidates`;
+  
+    db.query(sql, (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({
+        message: 'success',
+        data: rows
+      });
+    });
+  });
+
+// GET a single candidate terminal
 /*db.query(`SELECT * FROM candidates WHERE id = 1`, (err, row) => {
     if (err) {
       console.log(err);
@@ -30,7 +46,25 @@ const db = mysql.createConnection(
   });
 */
 
-// Delete a candidate
+/*/ Get a single candidate API endpoint
+app.get('/api/candidate/:id', (req, res) => {
+    const sql = `SELECT * FROM candidates WHERE id = ?`;
+    const params = [req.params.id];
+  
+    db.query(sql, params, (err, row) => {
+      if (err) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      res.json({
+        message: 'success',
+        data: row
+      });
+    });
+  });
+/*
+
+// Delete a candidate terminal 
 /*db.query(`DELETE FROM candidates WHERE id = ?`, 1, (err, result) => {
     if (err) {
       console.log(err);
@@ -39,8 +73,30 @@ const db = mysql.createConnection(
   });
 */
 
+// Delete a candidate API endpoint
+app.delete('/api/candidate/:id', (req, res) => {
+    const sql = `DELETE FROM candidates WHERE id = ?`;
+    const params = [req.params.id];
+  
+    db.query(sql, params, (err, result) => {
+      if (err) {
+        res.statusMessage(400).json({ error: res.message });
+      } else if (!result.affectedRows) {
+        res.json({
+          message: 'Candidate not found'
+        });
+      } else {
+        res.json({
+          message: 'deleted',
+          changes: result.affectedRows,
+          id: req.params.id
+        });
+      }
+    });
+  });
+
 // Create a candidate
-const sql = `INSERT INTO candidates (id, first_name, last_name, industry_connected) 
+/*const sql = `INSERT INTO candidates (id, first_name, last_name, industry_connected) 
               VALUES (?,?,?,?)`;
 const params = [1, 'Ronald', 'Firbank', 1];
 
@@ -50,6 +106,7 @@ db.query(sql, params, (err, result) => {
   }
   console.log(result);
 });
+*/
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
